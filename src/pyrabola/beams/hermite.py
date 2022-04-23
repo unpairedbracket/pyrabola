@@ -84,16 +84,15 @@ class BeamHermite(Beam):
         psi_new = np.arctan(self.beam_z / self.rayleigh)
         self.coeffs[:] = 0
         self.coeffs[-1,-1] = 1
-        e_full = H_reconstruct.V
-        #e_full = H_reconstruct.recompose(self.coeffs * self.hermite.get_phases(psi_new - self.psi_0))
-        #actual_terp = RegularGridInterpolator((u_full, v_full), e_full, bounds_error=False, fill_value=0)
-        #e_norm = actual_terp((u_norm, v_norm))
+        e_full = H_reconstruct.recompose(self.coeffs * self.hermite.get_phases(psi_new - self.psi_0))
+        actual_terp = RegularGridInterpolator((u_full, v_full), e_full, bounds_error=False, fill_value=0)
+        e_norm = actual_terp((u_norm, v_norm))
         
         #fig, axs = plt.subplots(1,2)
         #axs[0].imshow(H_reconstruct.U)
         #axs[1].imshow(H_reconstruct.V)
         #plt.show()
-        return e_full
+
         return e_norm / np.sqrt(1 + (self.beam_z / self.rayleigh)**2)
 
     def propagate_z(self, z):
