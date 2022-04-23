@@ -5,6 +5,7 @@ from numpy import array as arr
 from ..beams import Beam
 from ..beams.geometric import BeamFresnel
 from ..beams.hermite import BeamHermite
+from ..beams.fresnel_gouy import BeamGouyFresnel
 from .mirror import Mirror
 from .. import util
 
@@ -59,7 +60,7 @@ class Parabola(Mirror):
         mirror_e_field[np.abs(clip_R.imag) > 0] = 0
         if beam.clipping:
             mirror_e_field *= (clip_R <= self.radius)
-        newbeam = BeamHermite(
+        newbeam = BeamGouyFresnel(
             position=transformed_beam.position,
             normal=new_beam_normal, wavenumber=beam.wavenumber,
             beam_width=beam.width(), u=x, v=y, focal_length=f,
