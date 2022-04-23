@@ -32,7 +32,8 @@ class Camera():
             self.sensor[:] = 0
             return beam
 
-        beam.propagate_z(dz)
+        with util.timer('    Propagating beam to camera plane'):
+            beam.propagate_z(dz)
 
         max_dist = np.sqrt((self.size**2).sum()) + 2*beam.max_width()
 

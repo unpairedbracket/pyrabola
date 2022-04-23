@@ -1,6 +1,21 @@
+from contextlib import contextmanager
+
 import numpy as np
 from numpy import array as arr
 from numpy import sqrt, sin, cos, arctan2, dot, outer
+
+import time
+
+@contextmanager
+def timer(message):
+    print(message)
+    spaces = len(message) - len(message.lstrip(' '))
+    t0 = time.monotonic_ns()
+    try:
+        yield
+    finally:
+        t1 = time.monotonic_ns()
+        print(spaces * ' ' + f'Took {(t1-t0)*1e-6:0.3f}ms')
 
 
 def normal(theta, phi):

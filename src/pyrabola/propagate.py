@@ -1,3 +1,4 @@
+from .util import timer
 
 def propagate(beam_injector, optical_system):
     ''' Unconverted plot code
@@ -13,7 +14,8 @@ def propagate(beam_injector, optical_system):
 
     beam = beam_injector.get_beam()
     for element in optical_system:
-        beam = element.propagate(beam)
+        with timer(f'Propagating {element}'):
+            beam = element.propagate(beam)
 
     return beam
 
