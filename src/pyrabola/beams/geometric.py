@@ -19,9 +19,8 @@ class BeamGaussianGeometric(Beam):
         return self.beam_waist * np.sqrt(1 + (self.beam_z/self.rayleigh)**2)
 
     def e_field(self, x, y):
-        X, Y = np.meshgrid(x, y, indexing='ij')
         beam_width = self.width()
-        return np.exp(-(X**2+Y**2)/beam_width**2) * np.sqrt(np.pi)/beam_width
+        return np.exp(-(x**2+y**2)/beam_width**2) * np.sqrt(np.pi)/beam_width
 
 class BeamFresnel(Beam):
     e_field_complex = None
@@ -33,7 +32,7 @@ class BeamFresnel(Beam):
         self.e_field_complex = e_field
 
     def copy_with(self, position, normal):
-        return BeamComplex(position, normal, self.wavenumber,
+        return BeamFresnel(position, normal, self.wavenumber,
                 self.u, self.v, self.e_field_complex)
 
     def width(self):

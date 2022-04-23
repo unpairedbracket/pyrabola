@@ -42,11 +42,12 @@ class Parabola(Mirror):
         reflect = util.reflection_matrix(hit_normal)
         new_beam_normal = reflect @ transformed_beam.normal
 
-        x = np.linspace(-2, 2, 4001) * beam.width()
+        x, y = np.mgrid[-10:10:1001j, -10:10:1001j]* beam.width()
         u = x / (2*self.f0)
+        v = y / (2*self.f0)
 
         z_residual, focal_factor, clip_R = self.optical_path_difference(
-            u, u, transformed_beam, False
+            u, v, transformed_beam, False
         )
 
         nb_dot_nh = np.dot(hit_normal, -transformed_beam.normal)
@@ -54,20 +55,17 @@ class Parabola(Mirror):
         f = self.f0 / (focal_factor * nb_dot_nh)
 
         phase = beam.wavenumber * z_residual * nb_dot_nh
-        mirror_e_field = beam.e_field(x, x) * np.exp(1j * phase)
+        mirror_e_field = beam.e_field(x, y) * np.exp(1j * phase)
         mirror_e_field[np.abs(clip_R.imag) > 0] = 0
         if beam.clipping:
             mirror_e_field *= (clip_R <= self.radius)
-
-        #plt.imshow(abs(np.fft.fftshift(np.fft.fft2(mirror_e_field)))**2)
-        #plt.show()
-
-        return self.parabola_to_world(BeamHermite(
+        newbeam = BeamHermite(
             position=transformed_beam.position,
             normal=new_beam_normal, wavenumber=beam.wavenumber,
-            beam_width=beam.width(), u=x, v=x, focal_length=f,
+            beam_width=beam.width(), u=x, v=y, focal_length=f,
             e_field=mirror_e_field
-        ))
+        )
+        return self.parabola_to_world(newbeam)
 
     def world_to_parabola(self, beam):
         R_parabola = util.rot_matrix_angles(self.pitch, self.yaw).T
@@ -120,7 +118,7 @@ class Parabola(Mirror):
 
         return Beam(hit_position, transformed_normal, beam.wavenumber)
 
-    def optical_path_difference(self, u_beam, v_beam, beam_ray, full_evaluation=True):
+    def optical_path_difference(self, u, v, beam_ray, full_evaluation=True):
         '''
         Calculate optical path difference for specified beam with transverse coordinates u,v
         beam_ray: ray in parabola coordinates. position should already be in parabola coordinates,
@@ -132,8 +130,6 @@ class Parabola(Mirror):
 
         U, V, N = util.rot_matrix_normal(beam_ray.normal).T
         nx, ny, nz = N
-
-        u, v = np.meshgrid(u_beam, v_beam, indexing='ij')
 
         x0 = xh + U[0] * u + V[0] * v
         y0 = yh + U[1] * u + V[1] * v
