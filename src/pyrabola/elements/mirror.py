@@ -3,16 +3,23 @@ from numpy import array as arr
 from numpy import sqrt, sin, cos, dot, outer
 
 from ..beams import BeamMissed
+from .. import parser
 from .. import util
 
 
 class Mirror:
-    position = None
-    pitch = None
-    yaw = None
-    radius = None
+    @staticmethod
+    def from_dict(config_dict):
+        position = parser.position(config_dict['position'])
+        correct_angles = parser.euler_angles(config_dict['pointing'])
+        try:
+            radius = config_dict['radius']
+        except KeyError:
+            radius = float('inf')
 
-    def __init__(self, position, correct_angles, radius=float('inf')):
+        return Mirror(position, correct_angles, radius)
+
+    def __init__(self, position, correct_angles, radius):
         self.position = position
         self.pitch, self.yaw = correct_angles
         self.radius = radius

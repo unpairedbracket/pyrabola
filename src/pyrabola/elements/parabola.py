@@ -8,16 +8,40 @@ from ..beams.hermite import BeamHermite
 from ..beams.fresnel_gouy import BeamGouyFresnel
 from .mirror import Mirror
 from .. import util
+from .. import parser
 
 from matplotlib import pyplot as plt
 
 class Parabola(Mirror):
-    f0 = None
-    # Position of centre of OAP in parabola-centred coordinates
-    # The Mirror.position property of parabolas refers to
-    # the position of this point on their surface and
-    # rotation angles are defined about this point
-    X0 = np.array([0, 0])
+    @staticmethod
+    def from_dict(config_dict):
+        position = parser.position(config_dict['position'])
+        correct_angles = parser.euler_angles(config_dict['pointing'])
+        try:
+            radius = config_dict['radius']
+        except KeyError:
+            radius = float('inf')
+
+        roll = 0
+        match config_dict['off_axis']:
+            case {'offset': [U0, V0]}:
+                X0 = np.array([X0, Y0])
+                Phi = None
+                cosPhi2 = 1/(1 + X0**2 + Y0**2)
+            case {'angle': value, **others}:
+                Phi = parser.angle(value)
+                X0 = None
+                cosPhi2 = np.cos(Phi)**2
+                if 'roll' in others:
+                    roll = others['roll']
+
+        match config_dict['focal_length']:
+            case {'parent': value}:
+                pfl = value
+            case {'actual': value}:
+                pfl = value * cosPhi2
+
+        return Parabola(position, correct_angles, radius, pfl, Phi, roll, X0)
 
     def __init__(self, position, correct_angles, radius,
                  parent_focal_length, parabola_angle=None,

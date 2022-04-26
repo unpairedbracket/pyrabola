@@ -34,3 +34,7 @@ class Beam:
 class BeamMissed(Beam):
     def __init__(self):
         pass
+
+from .geometric import BeamGaussianGeometric
+from .fresnel_gouy import BeamGouyFresnel
+

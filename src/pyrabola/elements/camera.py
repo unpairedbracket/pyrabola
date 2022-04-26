@@ -1,15 +1,26 @@
 import numpy as np
 
+from .. import parser
 from .. import util
 
 
 class Camera():
-    def __init__(self, position, angles, px, size):
+    @staticmethod
+    def from_dict(config_dict):
+        position = parser.position(config_dict['position'])
+        angles = parser.euler_angles(config_dict['pointing'])
+        px = np.array(config_dict['pixels'])
+        size = np.array(config_dict['sensor_size'])
+        magnification = config_dict['magnification']
+        return Camera(position, angles, px, size, magnification)
+
+    def __init__(self, position, angles, px, size, magnification):
         self.position = position
         self.pitch = angles[0]
         self.yaw = angles[1]
         self.sensor = np.zeros(px)
         self.size = size
+        self.magnification = magnification
 
     def propagate(self, beam):
         cam_normal = util.normal(self.pitch, self.yaw)
@@ -42,8 +53,8 @@ class Camera():
             self.sensor[:] = 0
             return beam
 
-        cam_u = np.linspace(-1, 1, self.sensor.shape[0]) * self.size[0]/2
-        cam_v = np.linspace(-1, 1, self.sensor.shape[1]) * self.size[1]/2
+        cam_u = np.linspace(-1, 1, self.sensor.shape[0]) * self.size[0]/2 / self.magnification
+        cam_v = np.linspace(-1, 1, self.sensor.shape[1]) * self.size[1]/2 / self.magnification
         cam_u_vals, cam_v_vals = np.meshgrid(cam_u, cam_v, indexing='ij')
         cam_x = cam_u_vals * Uc[0] + cam_v_vals * Vc[0] - sensor_intersect[0]
         cam_y = cam_u_vals * Uc[1] + cam_v_vals * Vc[1] - sensor_intersect[1]
