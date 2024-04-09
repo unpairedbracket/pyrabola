@@ -20,9 +20,9 @@ class Mirror:
         return Mirror(position, correct_angles, radius)
 
     def __init__(self, position, correct_angles, radius):
-        self.position = position
-        self.pitch, self.yaw = correct_angles
-        self.radius = radius
+        self.position = np.array(position, 'float')
+        self.pitch, self.yaw = np.array(correct_angles, 'float')
+        self.radius = float(radius)
 
     def adjust_yaw(self, d_yaw):
         self.yaw += d_yaw

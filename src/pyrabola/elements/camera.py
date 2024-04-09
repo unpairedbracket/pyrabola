@@ -15,9 +15,8 @@ class Camera():
         return Camera(position, angles, px, size, magnification)
 
     def __init__(self, position, angles, px, size, magnification):
-        self.position = position
-        self.pitch = angles[0]
-        self.yaw = angles[1]
+        self.position = np.array(position, 'float')
+        self.pitch, self.yaw = np.array(angles, 'float')
         self.sensor = np.zeros(px)
         self.size = size
         self.magnification = magnification

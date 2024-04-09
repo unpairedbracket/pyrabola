@@ -48,12 +48,12 @@ except (FileNotFoundError, tomli.TOMLDecodeError):
     Phi = pi/180 * 30
     f0 = f * cos(Phi)**2
     elements = [
-        Mirror(arr([0, 0, 0]), [0, pi-pi/4], 5*25.4e-3),
-        Mirror(arr([1, 0, 0]), [0,   -pi/4], 5*25.4e-3),
-        Mirror(arr([1, 0, 1]), [0, pi+pi/4], 5*25.4e-3),
-        Mirror(arr([0, 0, 1]), [0,   +pi/4], 5*25.4e-3),
-        Parabola(arr([0, 0, 2]), [0.0, pi+0.0], radius=0.2, parent_focal_length=f0, parabola_angle=2*Phi),
-        Camera(arr([f*sin(2*Phi), 0, 2-f*cos(2*Phi)]), [0, -2*Phi], (640, 480), arr([64, 48])*2e-3, 1e4)
+        Mirror([0, 0, 0], [0, pi-pi/4], 5*25.4e-3),
+        Mirror([1, 0, 0], [0,   -pi/4], 5*25.4e-3),
+        Mirror([1, 0, 1], [0, pi+pi/4], 5*25.4e-3),
+        Mirror([0, 0, 1], [0,   +pi/4], 5*25.4e-3),
+        Parabola([0, 0, 2], [0.0, pi+0.0], radius=0.2, parent_focal_length=f0, parabola_angle=2*Phi),
+        Camera([f*sin(2*Phi), 0, 2-f*cos(2*Phi)], [0, -2*Phi], (640, 480), arr([64, 48])*2e-3, 1e4)
     ]
     parabola = elements[-2]
     camera = elements[-1]
