@@ -66,18 +66,33 @@ else:
             parabola = el
 
 
-fig, axs = plt.subplots(3, 3)
-for i, dtheta in enumerate(arange(3)):
-    parabola.pitch = 4e-5 * dtheta
-    for j, dphi in enumerate(arange(3)):
-        parabola.yaw = pi + 4e-5 * dphi
+fig, axs = plt.subplots(7, 7)
+for i, dx in enumerate(arange(-3,4)):
+    for j, dz in enumerate(arange(-3,4)):
+        parabola.position[0] = sin(2*Phi) * 1e-6 * dz - cos(2*Phi) * 1e-6 * dx 
+        parabola.position[2] = 2 - ( cos(2*Phi) * 1e-6 * dz + sin(2*Phi) * 1e-6 * dx )
         print('starting propagation')
         propagate(beam_injector, elements)
         print('finished')
-        axs[i,j].imshow(rot90(camera.read()), vmin=0, extent=(-32,32,-24,24))
+        axs[i,j].imshow(rot90(camera.read()), vmin=0, extent=(-32,32,-24,24), vmax=1000)
         axs[i,j].axis('off')
         print(i,j)
-        plt.imsave(f'images/phi_{dphi}_theta_{dtheta}.png', rot90(camera.read()), vmin=0, vmax=200)
-#plt.show()
+        plt.imsave(f'images/x_{dx}_z_{dz}.png', rot90(camera.read()), vmin=0, vmax=1000)
 
+parabola.position = arr([0,0,2]).astype('float')
+
+
+fig2, axs = plt.subplots(7, 7)
+for i, dtheta in enumerate(arange(-3,4)):
+    for j, dphi in enumerate(arange(-3,4)):
+        parabola.pitch = 1e-5 * dtheta 
+        parabola.yaw = pi + 1e-5 * dphi
+        print('starting propagation')
+        propagate(beam_injector, elements)
+        print('finished')
+        axs[i,j].imshow(rot90(camera.read()), vmin=0, extent=(-32,32,-24,24), vmax=1000)
+        axs[i,j].axis('off')
+        print(i,j)
+        plt.imsave(f'images/phi_{dphi}_theta_{dtheta}.png', rot90(camera.read()), vmin=0, vmax=1000)
+plt.show()
 
